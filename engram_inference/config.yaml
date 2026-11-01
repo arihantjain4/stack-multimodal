@@ -1,0 +1,63 @@
+# Inputs for the Engram baseline STACK runs described in
+# "PUBS AI Meeting 4 - Engram" (Group A cortical organoids, Group B sci-Plex).
+
+stack:
+  repo_id: arcinstitute/Stack-Large-Aligned
+  checkpoint_name: bc_large_aligned.ckpt
+  genelist_name: basecount_1000per_15000max.pkl
+  # Same generation settings as notebooks/tutorial-predict.ipynb.
+  prompt_ratio: 0.25
+  context_ratio: 0.4
+  context_ratio_min: 0.2
+  num_steps: 5
+  mode: mdm
+  batch_size: 1
+  num_workers: 0
+  random_seed: 0
+  # One model context window of query cells per split. The window size is
+  # read from the checkpoint (n_cells, prompt_ratio, context_ratio).
+  n_query_windows: 1
+
+cortical_organoid:
+  study_accession: SCP1756
+  study_slug: cortical-organoids-atlas
+  terra_namespace: organoids-levin
+  terra_workspace: cortical-organoids-atlas
+  split_column: age
+  barcode_column: NAME
+  cell_type_column: CellType
+  # Drop labels that are not a biological class.
+  exclude_cell_type_regex: '(?i)^(unknown|na|nan)$'
+  # A class counts as present at an age only when it has at least this many cells.
+  min_cells_per_age: 50
+  metadata_object: meta_all.txt
+  # {age} is filled from cluster files that have genes and barcodes locally.
+  # The run uses the earliest and latest of those ages.
+  expression_object_template: "expression_{age}.txt"
+  cluster_filename_template: "umap_{age}.txt"
+  genes_filename_template: "NormExpression_{age}_genes.txt"
+  barcodes_filename_template: "NormExpression_{age}_barcodes.txt"
+
+sciplex:
+  gsm: GSM4150378
+  source_cell_type: A549
+  target_cell_type: MCF7
+  split_column: perturbation
+  n_compounds: 3
+  # A compound is eligible when both lines have at least this many cells
+  # at the shared dose and exposure, so a measured target response exists.
+  min_cells_per_group: 200
+  # Same experiment as the GEO matrix. The h5ad is the scPerturb release of
+  # GSM4150378 (cell totals match the GEO pData). Used because the GEO count
+  # matrix host returns 403 to this environment.
+  figshare_article_id: 24681285
+  h5ad_name: SrivatsanTrapnell2020_sciplex3.h5ad
+  columns:
+    cell_line: cell_line
+    time: time
+    dose: dose_value
+    perturbation: perturbation
+  files:
+    counts: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4150nnn/GSM4150378/suppl/GSM4150378_sciPlex3_A549_MCF7_K562_screen_UMI.count.matrix.gz
+    genes: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4150nnn/GSM4150378/suppl/GSM4150378_sciPlex3_A549_MCF7_K562_screen_gene.annotations.txt.gz
+    cells: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4150nnn/GSM4150378/suppl/GSM4150378_sciPlex3_pData.txt.gz
