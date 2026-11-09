@@ -50,6 +50,13 @@ def ensure_h5ad(cfg: dict) -> Path:
 
 
 def load_symbols(annotation: Path, ensembl: pd.Series) -> list[str | None]:
+    """Symbol for every matrix column.
+
+    The h5ad var table carries the annotation's header line as an extra first row,
+    so var row i + 1 names the gene, but matrix column i holds annotation gene i
+    (the var `ncounts` of row i are the totals of column i). The trailing column
+    has no annotation entry.
+    """
     ids: list[str] = []
     symbols: list[str] = []
     with gzip.open(annotation, "rt") as handle:
@@ -67,7 +74,7 @@ def load_symbols(annotation: Path, ensembl: pd.Series) -> list[str | None]:
         )
     if not str(observed[1]).startswith(ids[0]):
         raise RuntimeError("Matrix gene columns are not in GEO annotation order")
-    return [None, *symbols]
+    return [*symbols, None]
 
 
 def select_groups(obs: pd.DataFrame, cfg: dict, n_base: int, n_test: int, seed: int):
