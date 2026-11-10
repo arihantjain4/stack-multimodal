@@ -1,0 +1,241 @@
+# Settings for the STACK bulk RNA-seq investigation and adaptation.
+# Every dataset is pulled from a public source by rule; nothing here is a sample list.
+
+paths:
+  # Model files are shared with engram_inference to avoid a second 2.6 GB download.
+  models: ../engram_inference/models
+  data: data
+  results: results
+  figures: figures
+
+figures:
+  # Variants drawn, in order (the first is the reference); embedding panels use the first n.
+  variants: [baseline, depth_scale_x1, thin_ensemble_x1, context_x1, bulk_head, side_channel, pca_imputer]
+  embedding_panels: 2
+
+stack:
+  checkpoint_name: bc_large_aligned.ckpt
+  genelist_name: basecount_1000per_15000max.pkl
+  random_seed: 0
+
+archs4:
+  url: https://s3.dev.maayanlab.cloud/archs4/files/human_gene_v2.latest.h5
+  block_size_mb: 4
+  # Expression columns are many small scattered chunks; read them with small blocks.
+  expression_block_size_kb: 64
+  # ARCHS4 flags each sample with the probability that it is single-cell.
+  max_singlecell_probability: 0.5
+  library_strategy: RNA-Seq
+  gentonik:
+    series: GSE172544
+    # Parsed from the GEO characteristics field ("cell line: ...", "treatment: ...").
+    field: characteristics_ch1
+    # Values may contain commas (compound cocktails), so each runs to the next "key:".
+    labels:
+      line: 'cell line:\s*(.+?)(?=,[A-Za-z ]+:|$)'
+      treatment: 'treatment:\s*(.+?)(?=,[A-Za-z ]+:|$)'
+  cell_lines:
+    # Bulk samples of the two sci-Plex lines, matched on the GEO cell-line field.
+    lines:
+      MCF7: '(?i)\bmcf[-\s]?7\b'
+      A549: '(?i)\ba[-\s]?549\b'
+    field: characteristics_ch1
+    n_per_line: 48
+    max_per_series: 3
+    min_aligned_reads: 5000000
+  training:
+    # Real bulk samples for adapter training: one per series, drawn at random from
+    # series that share nothing with the evaluation sets and never mention their lines.
+    n_samples: 384
+    max_per_series: 1
+    min_aligned_reads: 5000000
+  parallel_readers: 8
+
+scp1756:
+  accession: SCP1756
+  terra_namespace: organoids-levin
+  terra_workspace: cortical-organoids-atlas
+  # Two ages with a raw count matrix, a cluster file, and gene/barcode sidecars.
+  ages: [23days, 5month]
+  objects:
+    - umap_{age}.txt
+    - NormExpression_{age}_genes.txt
+    - NormExpression_{age}_barcodes.txt
+    - expression_{age}.txt
+  cell_type_column: CellType
+  barcode_column: NAME
+  exclude_cell_type_regex: '(?i)^(unknown|na|nan)$'
+  # Cells per (age, cell type) group, so every class can feed pseudobulk.
+  cells_per_group: 400
+  min_cells_per_group: 100
+
+sciplex:
+  figshare_article_id: 24681285
+  h5ad_name: SrivatsanTrapnell2020_sciplex3.h5ad
+  geo_gene_annotation: https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4150nnn/GSM4150378/suppl/GSM4150378_sciPlex3_A549_MCF7_K562_screen_gene.annotations.txt.gz
+  columns:
+    cell_line: cell_line
+    time: time
+    dose: dose_value
+    perturbation: perturbation
+  control_label: control
+  exposure: 24.0
+  cells_per_line: 600
+
+benchmark:
+  # Single-cell references, keyed by name, with the obs columns that define groups.
+  singlecell:
+    organoid_10x:
+      file: singlecell/organoid_cells.h5ad
+      group_columns: [age, cell_type]
+    sciplex_nuclei:
+      file: singlecell/sciplex_cells.h5ad
+      group_columns: [cell_type]
+  # Real bulk sets, the obs column used as label, and the single-cell reference
+  # whose median depth they are thinned to and whose embedding space they are compared in.
+  bulk:
+    gentonik_bulk:
+      file: bulk/gentonik_archs4.h5ad
+      label_column: line
+      reference: organoid_10x
+    celllines_bulk:
+      file: bulk/cell_lines_archs4.h5ad
+      label_column: cell_line
+      reference: sciplex_nuclei
+  # Pseudobulk aggregation levels (cells summed per profile).
+  aggregation_levels: [1, 5, 20, 100, 400]
+  profiles_per_group: 24
+  # Single cells kept per group in the evaluation set (k = 1).
+  cells_per_group_eval: 96
+  # Library sizes for the depth sweep, as multiples of the reference single-cell median.
+  depth_multipliers: [1, 10, 100, 1000, 10000]
+  # Fraction of model genes hidden in every masked-reconstruction test.
+  mask_fraction: 0.2
+  mask_repeats: 3
+  # Window sizes are capped by the checkpoint's n_cells.
+  window_size: 64
+  # Genes counted as expressed for the correlation metric (mean CPM in truth).
+  min_cpm_for_metric: 1.0
+  knn_k: 5
+  # Bootstrap over profiles for the confidence interval of recon_gain.
+  bootstrap: 1000
+  ci_level: 0.95
+  # Reference groups for cross-modal assignment: single cells, and the largest
+  # pseudobulk thinned to single-cell depth (aggregate matched to aggregate).
+  cross_modal_references: [cells, pb_thinned]
+
+treatment_effect:
+  # Downstream bulk task: hide genes, impute them, and compare the GENtoniK vs DMSO
+  # log2 fold change of the imputed genes with the measured one (per cell line).
+  set: gentonik_bulk/native
+  group_column: label
+  treatment_column: treatment
+  control: DMSO
+  treated: '1 uM GSK2869552, 1 uM EPZ5676, 1 uM NMDA, 1 uM Bay K 8644'
+  mask_repeats: 5
+  pseudocount_cpm: 1.0
+  min_cpm: 1.0
+  # Published DESeq2 tables (GSE172544 supplementary files, data/gentonik/) per line,
+  # downloaded from the GEO supplement of the GENtoniK series when missing.
+  geo_supplement_url: 'https://ftp.ncbi.nlm.nih.gov/geo/series/{stub}nnn/{series}/suppl/{file}'
+  published:
+    'WA09 (H9)': {file: gentonik/GSE172544_DESeq2_GENtoniK_DMSO.csv.gz, id_column: GeneID, id_type: symbol, lfc_column: log2(FC), padj_column: P-adj}
+    GM03348: {file: gentonik/GSE172544_iPSC_DESeq2_GENtonik_DMSO.csv.gz, id_column: Gene, id_type: symbol, lfc_column: log2(FC), padj_column: P-adj}
+    MSK-SRF001: {file: gentonik/GSE172544_iPSC_2_DESeq2_GENtoniK_DMSO.csv.gz, id_column: GeneID, id_type: ensembl, lfc_column: log(2)FC, padj_column: p-Adj}
+  padj_threshold: 0.05
+  variants: [baseline, depth_scale_x1, thin_ensemble_x1, context_x1, bulk_head, side_channel, pca_imputer]
+
+adapter:
+  # Reference library size: "auto" is the median library of all single cells in
+  # the benchmark; every target depth below is a multiple of it.
+  reference_depth: auto
+
+  # Held-out real ARCHS4 bulk samples (series disjoint from every evaluation set).
+  pool:
+    file: bulk/training_archs4.h5ad
+    validation_fraction: 0.1
+    window_size: 32
+    # Windows are an anchor sample plus its nearest pool neighbours, so training
+    # sees cohorts of similar samples like the evaluation sets; or "random".
+    window_composition: nearest_neighbors
+    # Depth views are thinned to a depth drawn log-uniformly between
+    # min_depth_multiplier x reference depth and the native depth.
+    min_depth_multiplier: 0.5
+
+  context:
+    beta_grid: [0.0, 0.25, 0.5, 0.75, 1.0, 1.5]
+    n_windows: 48
+
+  head:
+    depth_multiplier: 1
+    rank: 32
+    n_train_windows: 64
+    n_val_windows: 12
+    n_depth_views: 1
+    n_mask_draws: 2
+    epochs: 12
+    learning_rate: 0.003
+    weight_decay: 0.0
+    mask_fraction_min: 0.1
+    mask_fraction_max: 0.4
+    # Loss: NB NLL on hidden genes divided by the NLL of the leave-one-out prior,
+    # plus (1 - Pearson r) of hidden-gene log-CPM.
+    nb_weight: 1.0
+    corr_weight: 1.0
+    min_cpm_for_loss: 1.0
+    # Method-of-moments initial bulk dispersion is clipped to this range.
+    dispersion_min: 0.01
+    dispersion_max: 1000.0
+
+  side_channel:
+    rank: 32
+    # Gate g(s) = sigmoid(slope * (s - log(center))), s = log(library / target):
+    # closed for single cells, open for profiles far deeper than the target.
+    gate_slope: 4.0
+    gate_center_multiplier: 10
+    steps: 600
+    learning_rate: 0.002
+    head_learning_rate: 0.0005
+    weight_decay: 0.0
+    grad_clip: 1.0
+    n_val_windows: 12
+    validate_every: 100
+
+  pca_imputer:
+    n_components: 64
+    ridge: 1.0
+
+  # First attempt (before the brainstorm): per-gene affine + depth FiLM + LoRA on
+  # output_mlp, trained with train_adapter.py.
+  film_lora:
+    weights: film_lora_adapter.pt
+    depth_multiplier: 10
+    film_hidden: 32
+    lora_rank: 16
+    lora_alpha: 16
+    steps: 400
+    window_size: 32
+    learning_rate: 0.002
+    weight_decay: 0.0
+    mask_fraction_min: 0.1
+    mask_fraction_max: 0.4
+    multinomial_weight: 1.0
+    logcpm_weight: 1.0
+    visible_weight: 0.1
+    min_cpm_for_loss: 1.0
+    log_every: 20
+    validate_every: 100
+
+  variants:
+    depth_scale_x1: {type: depth_scale, depth_multiplier: 1}
+    depth_scale_x10: {type: depth_scale, depth_multiplier: 10}
+    depth_scale_x100: {type: depth_scale, depth_multiplier: 100}
+    thin_ensemble_x1: {type: thin_ensemble, depth_multiplier: 1, draws: 8}
+    thin_ensemble_x10: {type: thin_ensemble, depth_multiplier: 10, draws: 8}
+    pseudocell_x10: {type: pseudocell, depth_multiplier: 10, draws: 8}
+    film_lora_adapter: {type: film_lora}
+    context_x1: {type: context_decoder, base: depth_scale_x1, prior: window_loo}
+    context_x1_pool_prior: {type: context_decoder, base: depth_scale_x1, prior: training_pool}
+    bulk_head: {type: bulk_head}
+    side_channel: {type: side_channel}
+    pca_imputer: {type: pca_imputer}

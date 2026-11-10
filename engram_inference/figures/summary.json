@@ -79,43 +79,43 @@
   },
   "sciplex": {
     "n_query": 179,
-    "library_observed_median": 1432.0,
+    "library_observed_median": 1535.0,
     "profile_corr_vs_mcf7_vehicle": {
-      "control": 0.01887483149766922,
-      "Ki8751": 0.01987779699265957,
-      "Tranylcypromine (2-PCPA) HCl": 0.02040531300008297,
-      "GSK J1": 0.019656240940093994
+      "control": 0.6595176458358765,
+      "Ki8751": 0.6558396220207214,
+      "Tranylcypromine (2-PCPA) HCl": 0.6478184461593628,
+      "GSK J1": 0.6510526537895203
     },
     "profile_corr_vs_a549_same_context": {
-      "control": 0.015261843800544739,
-      "Ki8751": 0.01721406914293766,
-      "Tranylcypromine (2-PCPA) HCl": 0.01799420826137066,
-      "GSK J1": 0.01951034925878048
+      "control": 0.7621630430221558,
+      "Ki8751": 0.7681854367256165,
+      "Tranylcypromine (2-PCPA) HCl": 0.7793277502059937,
+      "GSK J1": 0.7692694664001465
     },
     "profile_corr_vs_query_window": {
-      "control": 0.0182611383497715,
-      "Ki8751": 0.019240448251366615,
-      "Tranylcypromine (2-PCPA) HCl": 0.019800307229161263,
-      "GSK J1": 0.018831796944141388
+      "control": 0.6575154662132263,
+      "Ki8751": 0.6536591053009033,
+      "Tranylcypromine (2-PCPA) HCl": 0.6459551453590393,
+      "GSK J1": 0.6490537524223328
     },
     "cell_median_corr_vs_query": {
-      "control": 0.00647291773930192,
-      "Ki8751": 0.007027080748230219,
-      "Tranylcypromine (2-PCPA) HCl": 0.005875156726688147,
-      "GSK J1": 0.00708671985194087
+      "control": 0.18672752380371094,
+      "Ki8751": 0.17306259274482727,
+      "Tranylcypromine (2-PCPA) HCl": 0.17931783199310303,
+      "GSK J1": 0.17224256694316864
     },
     "delta_corr_vs_real_mcf7": {
-      "Ki8751": -0.0023647581692785025,
-      "Tranylcypromine (2-PCPA) HCl": 0.008957711048424244,
-      "GSK J1": -0.006973708048462868
+      "Ki8751": 0.0011787717230618,
+      "Tranylcypromine (2-PCPA) HCl": 0.018025098368525505,
+      "GSK J1": 0.07884802669286728
     },
     "delta_corr_vs_real_a549": {
-      "Ki8751": -0.005176810082048178,
-      "Tranylcypromine (2-PCPA) HCl": 0.0311532411724329,
-      "GSK J1": 0.028533339500427246
+      "Ki8751": 0.0031758027616888285,
+      "Tranylcypromine (2-PCPA) HCl": 0.03780326992273331,
+      "GSK J1": 0.043527036905288696
     },
-    "real_mcf7_vs_a549_delta_Ki8751": 0.04484504088759422,
-    "real_mcf7_vs_a549_delta_Tranylcypromine (2-PCPA) HCl": 0.004505842924118042,
-    "real_mcf7_vs_a549_delta_GSK J1": -0.03313048928976059
+    "real_mcf7_vs_a549_delta_Ki8751": 0.024540835991501808,
+    "real_mcf7_vs_a549_delta_Tranylcypromine (2-PCPA) HCl": 0.0012825243175029755,
+    "real_mcf7_vs_a549_delta_GSK J1": -0.009299930185079575
   }
 }
