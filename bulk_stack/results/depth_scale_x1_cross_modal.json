@@ -1,0 +1,136 @@
+[
+  {
+    "bulk_set": "gentonik_bulk/native",
+    "reference": "organoid_10x/cells",
+    "n": 29,
+    "stack_assignment": {
+      "23days|FOXG1- EMX1- neurons": 14,
+      "5month|Unspecified PN": 6,
+      "5month|CPN": 3,
+      "23days|Preplate/Subplate": 2,
+      "23days|Subcortical neurons": 2,
+      "23days|Subcortical interneurons": 2
+    },
+    "correlation_assignment": {
+      "5month|CPN": 29
+    }
+  },
+  {
+    "bulk_set": "gentonik_bulk/thinned",
+    "reference": "organoid_10x/cells",
+    "n": 29,
+    "stack_assignment": {
+      "23days|FOXG1- EMX1- neurons": 9,
+      "23days|Preplate/Subplate": 7,
+      "23days|Subcortical interneurons": 5,
+      "5month|Unspecified PN": 3,
+      "23days|Subcortical neurons": 3,
+      "5month|CFuPN": 1,
+      "5month|CPN": 1
+    },
+    "correlation_assignment": {
+      "5month|CPN": 22,
+      "23days|FOXG1- EMX1- neurons": 5,
+      "5month|CFuPN": 2
+    }
+  },
+  {
+    "bulk_set": "gentonik_bulk/native",
+    "reference": "organoid_10x/pb400_thinned",
+    "n": 29,
+    "stack_assignment": {
+      "23days|FOXG1- EMX1- neurons": 15,
+      "5month|Unspecified PN": 5,
+      "5month|CPN": 4,
+      "23days|Subcortical interneurons": 2,
+      "23days|Subcortical neurons": 2,
+      "23days|Preplate/Subplate": 1
+    },
+    "correlation_assignment": {
+      "5month|CPN": 29
+    }
+  },
+  {
+    "bulk_set": "gentonik_bulk/thinned",
+    "reference": "organoid_10x/pb400_thinned",
+    "n": 29,
+    "stack_assignment": {
+      "23days|FOXG1- EMX1- neurons": 11,
+      "23days|Subcortical interneurons": 5,
+      "23days|Preplate/Subplate": 4,
+      "23days|Subcortical neurons": 3,
+      "5month|Unspecified PN": 3,
+      "5month|CPN": 2,
+      "23days|Neural placode": 1
+    },
+    "correlation_assignment": {
+      "5month|CPN": 29
+    }
+  },
+  {
+    "bulk_set": "celllines_bulk/native",
+    "reference": "sciplex_nuclei/cells",
+    "n": 96,
+    "stack_accuracy": 0.96875,
+    "correlation_accuracy": 0.9895833333333334,
+    "stack_assignment": {
+      "MCF7": 48,
+      "A549": 47,
+      "K562": 1
+    },
+    "correlation_assignment": {
+      "MCF7": 48,
+      "A549": 47,
+      "K562": 1
+    }
+  },
+  {
+    "bulk_set": "celllines_bulk/thinned",
+    "reference": "sciplex_nuclei/cells",
+    "n": 96,
+    "stack_accuracy": 0.9583333333333334,
+    "correlation_accuracy": 0.96875,
+    "stack_assignment": {
+      "MCF7": 49,
+      "A549": 46,
+      "K562": 1
+    },
+    "correlation_assignment": {
+      "A549": 49,
+      "MCF7": 46,
+      "K562": 1
+    }
+  },
+  {
+    "bulk_set": "celllines_bulk/native",
+    "reference": "sciplex_nuclei/pb400_thinned",
+    "n": 96,
+    "stack_accuracy": 0.96875,
+    "correlation_accuracy": 0.96875,
+    "stack_assignment": {
+      "MCF7": 49,
+      "A549": 46,
+      "K562": 1
+    },
+    "correlation_assignment": {
+      "A549": 49,
+      "MCF7": 46,
+      "K562": 1
+    }
+  },
+  {
+    "bulk_set": "celllines_bulk/thinned",
+    "reference": "sciplex_nuclei/pb400_thinned",
+    "n": 96,
+    "stack_accuracy": 0.9583333333333334,
+    "correlation_accuracy": 0.96875,
+    "stack_assignment": {
+      "MCF7": 50,
+      "A549": 46
+    },
+    "correlation_assignment": {
+      "A549": 49,
+      "MCF7": 47
+    }
+  }
+]
